@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satyaprakash Kushwaha - Resume</title>
+    <style>
+        :root {
+            --primary: #030712;
+            --secondary: #4b5563;
+            --accent: #06d6a0;
+            --border: #e5e7eb;
+        }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--primary);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+        }
+        header {
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        h1 { margin: 0; font-size: 2.5rem; letter-spacing: -0.02em; }
+        .subtitle { font-size: 1.1rem; color: var(--secondary); font-weight: 500; }
+        .contact-info { text-align: right; font-size: 0.9rem; color: var(--secondary); }
+        .contact-info a { color: var(--primary); text-decoration: none; }
+        
+        section { margin-bottom: 30px; }
+        h2 { 
+            font-size: 1.2rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+            color: var(--secondary); 
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .exp-item { margin-bottom: 20px; }
+        .exp-header { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 5px; }
+        .exp-sub { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--secondary); margin-bottom: 10px; }
+        .exp-desc { padding-left: 20px; margin: 0; }
+        .exp-desc li { margin-bottom: 5px; font-size: 0.95rem; }
+        
+        .skills-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .skill-cat h3 { font-size: 1rem; margin-bottom: 10px; color: var(--primary); }
+        .skill-list { font-size: 0.9rem; color: var(--secondary); }
+
+        @media print {
+            body { padding: 20px; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="background: #f3f4f6; padding: 10px; text-align: center; border-radius: 8px; margin-bottom: 20px;">
+        Tip: Press <strong>Ctrl + P</strong> and select "Save as PDF" to get your resume file.
+    </div>
+
+    <header>
+        <div>
+            <h1>SATYAPRAKASH KUSHWAHA</h1>
+            <div class="subtitle">Senior GIS Specialist & AI Engineer</div>
+        </div>
+        <div class="contact-info">
+            <div>📍 Noida, Uttar Pradesh, India</div>
+            <div>📱 +91 8851917675</div>
+            <div>📧 <a href="mailto:satyaprakashkushwaha577@gmail.com">satyaprakashkushwaha577@gmail.com</a></div>
+            <div>🌐 Portfolio: satyaprakash.dev (local)</div>
+        </div>
+    </header>
+
+    <section>
+        <h2>Professional Summary</h2>
+        <p>Results-oriented Senior GIS Specialist with over 7 years of experience in Global Map Content Management and HD Mapping. Expert in optimizing map zones for high-end navigation platforms like TomTom HOME and MyDrive Connect. Proven track record of leading teams and delivering high-accuracy geospatial data across 20+ countries. Currently expanding expertise into AI engineering and automated geospatial workflows.</p>
+    </section>
+
+    <section>
+        <h2>Work Experience</h2>
+        
+        <div class="exp-item">
+            <div class="exp-header">
+                <span>Senior GIS Specialist (Group Lead)</span>
+                <span>Cyient Limited</span>
+            </div>
+            <div class="exp-sub">
+                <span>Aug 2021 – Present</span>
+                <span>Noida, India</span>
+            </div>
+            <ul class="exp-desc">
+                <li>Manage global map content for 20+ countries including USA, Canada, UK, Germany, and India.</li>
+                <li>Optimize Map Zones for TomTom HOME and MyDrive Connect platforms across Europe.</li>
+                <li>Lead a team of 15 members for end-to-end HD mapping and HAD dataset workflows.</li>
+                <li>Digitize complex road networks, junctions, and POIs to global navigation standards.</li>
+                <li>Specialize in Quality Assurance for partial coverage regions (Turkey, Russia, Ukraine).</li>
+            </ul>
+        </div>
+
+        <div class="exp-item">
+            <div class="exp-header">
+                <span>GIS Engineer</span>
+                <span>Cyient Limited</span>
+            </div>
+            <div class="exp-sub">
+                <span>Aug 2018 – Aug 2021</span>
+                <span>Noida, India</span>
+            </div>
+            <ul class="exp-desc">
+                <li>Executed lane mapping and road geometry updates for navigation datasets.</li>
+                <li>Processed restriction data and point-of-interest (POI) updates.</li>
+                <li>Validated geographic rules for diverse international territories.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>Technical Skills</h2>
+        <div class="skills-grid">
+            <div class="skill-cat">
+                <h3>Domain Expertise</h3>
+                <div class="skill-list">Geospatial Data Engineering, HD Mapping (Genesis), Navigation Data Strategy, Digital Mapping Systems.</div>
+            </div>
+            <div class="skill-cat">
+                <h3>Tools & Platforms</h3>
+                <div class="skill-list">TomTom HOME, MyDrive Connect, QGIS, ArcGIS, Map Editor, Vertex, Orbis.</div>
+            </div>
+            <div class="skill-cat">
+                <h3>Regional Expertise</h3>
+                <div class="skill-list">North America (USA, Canada), Europe (UK, Germany, France), APAC (India, Australia).</div>
+            </div>
+            <div class="skill-cat">
+                <h3>AI & Automation</h3>
+                <div class="skill-list">Prompt Engineering, AI Workflow Automation, GIS + AI Integration.</div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Education</h2>
+        <div class="exp-item">
+            <div class="exp-header">
+                <span>Bachelor's Degree / Relevant Certification</span>
+                <span>[Your University/Institute]</span>
+            </div>
+            <div class="exp-sub">
+                <span>[Year]</span>
+                <span>[Location]</span>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
