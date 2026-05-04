@@ -10,6 +10,7 @@ import ServicesSection from './components/ServicesSection';
 import ContactSection from './components/ContactSection';
 import FooterSection from './components/FooterSection';
 import ParticlesBackground from './components/ParticlesBackground';
+import NayraAI from './components/NayraAI';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
         <ContactSection />
       </main>
       <FooterSection />
+      <NayraAI />
     </>
   );
 }
