@@ -1,5 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
+import Groq from 'groq-sdk';
 import TiltWrapper from './TiltWrapper';
+
+// Initialize Groq client
+const groq = new Groq({
+  apiKey: import.meta.env.VITE_GROQ_API_KEY,
+  dangerouslyAllowBrowser: true // Required for client-side usage
+});
 
 export default function NayraAI() {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,39 +33,31 @@ export default function NayraAI() {
     setIsTyping(true);
 
     try {
-      // Use the local API proxy
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [
-            {
-              role: "system",
-              content: `You are NAYRA AI, the professional AI assistant for Satyaprakash Kushwaha. 
-              ABOUT SATYAPRAKASH: Senior GIS Specialist & AI Engineer, 7+ years experience, Cyient Group Lead.
-              REFER TO HIM AS: "my creator". Keep it professional.`
-            },
-            ...messages.map(m => ({ role: m.role, content: m.content })),
-            userMsg
-          ]
-        })
-      });
-
-      if (!response.ok) {
-        // Fallback for local development if /api/chat is not available
-        throw new Error('Local proxy not found');
+      if (!import.meta.env.VITE_GROQ_API_KEY) {
+        throw new Error('Missing API Key');
       }
 
-      const data = await response.json();
-      const aiResponse = data.choices[0].message.content;
+      const completion = await groq.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: `You are NAYRA AI, the professional AI assistant for Satyaprakash Kushwaha. 
+            ABOUT SATYAPRAKASH: Senior GIS Specialist & AI Engineer, 7+ years experience, Cyient Group Lead.
+            REFER TO HIM AS: "my creator". Keep it professional.`
+          },
+          ...messages.map(m => ({ role: m.role, content: m.content })),
+          userMsg
+        ],
+        model: "llama-3.1-70b-versatile",
+      });
+
+      const aiResponse = completion.choices[0].message.content;
       setMessages(prev => [...prev, { role: 'assistant', content: aiResponse }]);
     } catch (error) {
-      console.warn('Proxy error, trying direct call (may fail due to CORS):', error);
-      
-      // If the proxy fails (like in npm run dev), we show a helpful message
+      console.error('Nayra AI Error:', error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: "I'm currently in 'Production Mode'. To chat with me, please push the code to GitHub/Vercel, or run 'vercel dev' locally. I'll be fully active there! 🚀" 
+        content: "I'm having trouble connecting to my neural network. Please ensure the API key is correctly configured in your environment! 🚀" 
       }]);
     } finally {
       setIsTyping(false);
