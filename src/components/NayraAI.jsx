@@ -1,12 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import Groq from 'groq-sdk';
 import TiltWrapper from './TiltWrapper';
-
-// Initialize Groq client
-const groq = new Groq({
-  apiKey: import.meta.env.VITE_GROQ_API_KEY,
-  dangerouslyAllowBrowser: true // Required for client-side usage
-});
 
 export default function NayraAI() {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,31 +26,47 @@ export default function NayraAI() {
     setIsTyping(true);
 
     try {
-      if (!import.meta.env.VITE_GROQ_API_KEY) {
+      const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+      if (!apiKey) {
         throw new Error('Missing API Key');
       }
 
-      const completion = await groq.chat.completions.create({
-        messages: [
-          {
-            role: "system",
-            content: `You are NAYRA AI, the professional AI assistant for Satyaprakash Kushwaha. 
-            ABOUT SATYAPRAKASH: Senior GIS Specialist & AI Engineer, 7+ years experience, Cyient Group Lead.
-            REFER TO HIM AS: "my creator". Keep it professional.`
-          },
-          ...messages.map(m => ({ role: m.role, content: m.content })),
-          userMsg
-        ],
-        model: "llama-3.1-70b-versatile",
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "system",
+              content: `You are NAYRA AI, the professional AI assistant for Satyaprakash Kushwaha. 
+              ABOUT SATYAPRAKASH: Senior GIS Specialist & AI Engineer, 7+ years experience, Cyient Group Lead.
+              REFER TO HIM AS: "my creator". Keep it professional.`
+            },
+            ...messages.map(m => ({ role: m.role, content: m.content })),
+            userMsg
+          ],
+          model: "llama-3.1-70b-versatile",
+          temperature: 0.7,
+          max_tokens: 500
+        })
       });
 
-      const aiResponse = completion.choices[0].message.content;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'API request failed');
+      }
+
+      const data = await response.json();
+      const aiResponse = data.choices[0].message.content;
       setMessages(prev => [...prev, { role: 'assistant', content: aiResponse }]);
     } catch (error) {
       console.error('Nayra AI Error:', error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: "I'm having trouble connecting to my neural network. Please ensure the API key is correctly configured in your environment! 🚀" 
+        content: "I'm having trouble connecting. Please check if your API key is correctly added to Vercel! 🚀" 
       }]);
     } finally {
       setIsTyping(false);
