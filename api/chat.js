@@ -11,6 +11,11 @@ export default async function handler(req, res) {
 
   const { messages } = req.body;
 
+  if (!process.env.VITE_GROQ_API_KEY) {
+    console.error('Missing VITE_GROQ_API_KEY environment variable');
+    return res.status(500).json({ error: 'AI configuration error: Missing API Key' });
+  }
+
   try {
     const completion = await groq.chat.completions.create({
       model: "llama-3.1-70b-versatile", // Using a reliable Groq model
