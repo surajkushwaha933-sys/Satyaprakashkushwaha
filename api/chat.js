@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
   try {
     const completion = await groq.chat.completions.create({
-      model: "llama-3.1-70b-versatile", // Using a reliable Groq model
+      model: "llama-3.3-70b-versatile", // Updated: 3.1 was decommissioned
       messages: messages,
       temperature: 0.7,
       max_tokens: 500,

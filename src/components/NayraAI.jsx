@@ -1,10 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
-import TiltWrapper from './TiltWrapper';
+
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
+const SYSTEM_PROMPT = `You are NAYRA AI, the professional AI assistant created by Satyaprakash Kushwaha. 
+ABOUT SATYAPRAKASH: Senior GIS Specialist & AI Engineer with 7+ years of experience. Currently Group Lead at Cyient. 
+Expert in HD Mapping, Autonomous Driving Data, Lane-Level Systems, TomTom technologies, and AI/ML.
+RULES: Always refer to Satyaprakash as "my creator". Keep responses concise, professional, and helpful.
+If asked about yourself, say you are NAYRA AI — a custom AI assistant built into this portfolio.`;
 
 export default function NayraAI() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'Hi! I am NAYRA AI, your geospatial intelligence assistant. How can I help you today?' }
+    { role: 'assistant', content: 'Hey! I\'m NAYRA AI 🤖 Ask me anything about Satyaprakash!' }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -28,10 +36,10 @@ export default function NayraAI() {
     try {
       const apiKey = import.meta.env.VITE_GROQ_API_KEY;
       if (!apiKey) {
-        throw new Error('Missing API Key');
+        throw new Error('API key not configured');
       }
 
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const response = await fetch(GROQ_API_URL, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
@@ -39,34 +47,29 @@ export default function NayraAI() {
         },
         body: JSON.stringify({
           messages: [
-            {
-              role: "system",
-              content: `You are NAYRA AI, the professional AI assistant for Satyaprakash Kushwaha. 
-              ABOUT SATYAPRAKASH: Senior GIS Specialist & AI Engineer, 7+ years experience, Cyient Group Lead.
-              REFER TO HIM AS: "my creator". Keep it professional.`
-            },
+            { role: 'system', content: SYSTEM_PROMPT },
             ...messages.map(m => ({ role: m.role, content: m.content })),
             userMsg
           ],
-          model: "llama-3.1-70b-versatile",
+          model: GROQ_MODEL,
           temperature: 0.7,
-          max_tokens: 500
+          max_tokens: 400
         })
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'API request failed');
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error?.message || `API error ${response.status}`);
       }
 
       const data = await response.json();
-      const aiResponse = data.choices[0].message.content;
+      const aiResponse = data.choices?.[0]?.message?.content || 'Sorry, I couldn\'t process that.';
       setMessages(prev => [...prev, { role: 'assistant', content: aiResponse }]);
     } catch (error) {
       console.error('Nayra AI Error:', error);
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: "I'm having trouble connecting. Please check if your API key is correctly added to Vercel! 🚀" 
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `⚠️ ${error.message || 'Connection error. Please try again!'}`
       }]);
     } finally {
       setIsTyping(false);
@@ -74,125 +77,162 @@ export default function NayraAI() {
   };
 
   return (
-    <div style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 9999 }}>
+    <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999 }}>
+      {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          width: '65px', height: '65px', borderRadius: '50%',
-          background: 'var(--gradient-main)', border: 'none', cursor: 'pointer',
-          boxShadow: '0 10px 30px rgba(6, 214, 160, 0.4)',
+          width: '52px', height: '52px', borderRadius: '50%',
+          background: 'linear-gradient(135deg, #06d6a0, #4361ee)',
+          border: '2px solid rgba(6, 214, 160, 0.4)',
+          cursor: 'pointer',
+          boxShadow: '0 4px 20px rgba(6, 214, 160, 0.35)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '1.8rem', transition: 'all 0.4s',
-          transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
+          fontSize: '1.4rem', transition: 'all 0.3s ease',
+          transform: isOpen ? 'rotate(90deg) scale(0.9)' : 'rotate(0deg) scale(1)',
         }}
       >
         {isOpen ? '✕' : '🤖'}
       </button>
 
+      {/* Chat Window - Small, 3D, Transparent */}
       {isOpen && (
         <div style={{
-          position: 'absolute', bottom: '85px', right: '0',
-          width: '380px', height: '550px', display: 'flex', flexDirection: 'column',
-          animation: 'nayraReveal 0.4s ease-out',
+          position: 'absolute', bottom: '65px', right: '0',
+          width: '320px', height: '420px',
+          display: 'flex', flexDirection: 'column',
+          animation: 'nayraPopIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          perspective: '800px',
         }}>
-          <TiltWrapper intensity={1}>
-            <div className="glass-card" style={{
-              height: '550px', padding: '0', display: 'flex', flexDirection: 'column',
-              background: 'rgba(3, 7, 18, 0.95)', backdropFilter: 'blur(20px)',
-              borderColor: 'rgba(6, 214, 160, 0.2)', overflow: 'hidden',
+          <div style={{
+            height: '100%', display: 'flex', flexDirection: 'column',
+            background: 'rgba(3, 7, 18, 0.75)',
+            backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
+            border: '1px solid rgba(6, 214, 160, 0.15)',
+            borderRadius: '16px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 60px rgba(6, 214, 160, 0.08), inset 0 1px 0 rgba(255,255,255,0.05)',
+            overflow: 'hidden',
+            transform: 'rotateX(2deg) rotateY(-1deg)',
+            transformStyle: 'preserve-3d',
+            transition: 'transform 0.3s ease',
+          }}>
+            {/* Header */}
+            <div style={{
+              padding: '0.8rem 1rem',
+              background: 'linear-gradient(135deg, rgba(6, 214, 160, 0.12), rgba(67, 97, 238, 0.08))',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+              display: 'flex', alignItems: 'center', gap: '0.6rem',
             }}>
               <div style={{
-                padding: '1.25rem 1.5rem',
-                background: 'linear-gradient(to right, rgba(6, 214, 160, 0.1), transparent)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                display: 'flex', alignItems: 'center', gap: '1rem',
-              }}>
-                <div style={{
-                  width: '40px', height: '40px', borderRadius: '12px',
-                  background: 'var(--gradient-main)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '1.2rem',
-                }}>
-                  🤖
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.95rem' }}>NAYRA AI</div>
-                  <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>
-                    Created by <span style={{ color: 'var(--accent-cyan)' }}>Satyaprakash</span>
-                  </div>
+                width: '30px', height: '30px', borderRadius: '8px',
+                background: 'linear-gradient(135deg, #06d6a0, #4361ee)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '0.9rem',
+              }}>🤖</div>
+              <div>
+                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, color: '#f0f0f0', fontSize: '0.8rem', letterSpacing: '0.05em' }}>NAYRA AI</div>
+                <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>
+                  POWERED BY <span style={{ color: '#06d6a0' }}>GROQ</span>
                 </div>
               </div>
-
-              <div 
-                ref={scrollRef}
-                style={{
-                  flex: 1, padding: '1.5rem', overflowY: 'auto',
-                  display: 'flex', flexDirection: 'column', gap: '1rem',
-                }}
-                className="custom-scrollbar"
-              >
-                {messages.map((msg, i) => (
-                  <div key={i} style={{
-                    alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                    maxWidth: '85%', padding: '0.8rem 1rem',
-                    borderRadius: msg.role === 'user' ? '18px 18px 2px 18px' : '18px 18px 18px 2px',
-                    background: msg.role === 'user' ? 'var(--accent-cyan)' : 'rgba(255,255,255,0.05)',
-                    color: msg.role === 'user' ? '#000' : 'var(--text-primary)',
-                    fontSize: '0.85rem', lineHeight: 1.5,
-                  }}>
-                    {msg.content}
-                  </div>
-                ))}
-                {isTyping && (
-                  <div style={{ alignSelf: 'flex-start', background: 'rgba(255,255,255,0.05)', padding: '0.8rem', borderRadius: '18px' }}>
-                    <div className="typing-dots"><span></span><span></span><span></span></div>
-                  </div>
-                )}
-              </div>
-
-              <form onSubmit={handleSend} style={{
-                padding: '1.25rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-                display: 'flex', gap: '0.75rem',
-              }}>
-                <input
-                  type="text" placeholder="Ask me about Satyaprakash..."
-                  value={input} onChange={(e) => setInput(e.target.value)}
-                  style={{
-                    flex: 1, background: 'rgba(255, 255, 255, 0.03)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '12px',
-                    padding: '0.75rem 1rem', color: 'var(--text-primary)',
-                    fontSize: '0.85rem', outline: 'none',
-                  }}
-                />
-                <button type="submit" disabled={isTyping} style={{
-                  background: isTyping ? 'rgba(255,255,255,0.1)' : 'var(--gradient-main)',
-                  border: 'none', borderRadius: '12px', width: '45px', height: '45px',
-                  cursor: isTyping ? 'wait' : 'pointer', display: 'flex',
-                  alignItems: 'center', justifyContent: 'center', color: '#000',
-                }}>
-                  {isTyping ? '...' : '→'}
-                </button>
-              </form>
+              <div style={{
+                marginLeft: 'auto', width: '6px', height: '6px',
+                borderRadius: '50%', background: '#06d6a0',
+                boxShadow: '0 0 8px #06d6a0',
+                animation: 'nayraLive 2s infinite',
+              }} />
             </div>
-          </TiltWrapper>
+
+            {/* Messages */}
+            <div
+              ref={scrollRef}
+              style={{
+                flex: 1, padding: '0.8rem', overflowY: 'auto',
+                display: 'flex', flexDirection: 'column', gap: '0.5rem',
+              }}
+              className="custom-scrollbar"
+            >
+              {messages.map((msg, i) => (
+                <div key={i} style={{
+                  alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                  maxWidth: '82%', padding: '0.5rem 0.7rem',
+                  borderRadius: msg.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                  background: msg.role === 'user'
+                    ? 'linear-gradient(135deg, rgba(6, 214, 160, 0.9), rgba(67, 97, 238, 0.9))'
+                    : 'rgba(255,255,255,0.06)',
+                  border: msg.role === 'user' ? 'none' : '1px solid rgba(255,255,255,0.05)',
+                  color: msg.role === 'user' ? '#000' : 'rgba(255,255,255,0.85)',
+                  fontSize: '0.75rem', lineHeight: 1.5,
+                  backdropFilter: 'blur(10px)',
+                }}>
+                  {msg.content}
+                </div>
+              ))}
+              {isTyping && (
+                <div style={{
+                  alignSelf: 'flex-start',
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                  padding: '0.5rem 0.8rem', borderRadius: '12px',
+                }}>
+                  <div className="nayra-dots"><span /><span /><span /></div>
+                </div>
+              )}
+            </div>
+
+            {/* Input */}
+            <form onSubmit={handleSend} style={{
+              padding: '0.7rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+              display: 'flex', gap: '0.5rem',
+              background: 'rgba(0,0,0,0.2)',
+            }}>
+              <input
+                type="text" placeholder="Ask about Satyaprakash..."
+                value={input} onChange={(e) => setInput(e.target.value)}
+                style={{
+                  flex: 1, background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '10px',
+                  padding: '0.55rem 0.75rem', color: '#f0f0f0',
+                  fontSize: '0.75rem', outline: 'none',
+                  transition: 'border-color 0.2s',
+                }}
+                onFocus={(e) => e.target.style.borderColor = 'rgba(6, 214, 160, 0.4)'}
+                onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.08)'}
+              />
+              <button type="submit" disabled={isTyping} style={{
+                background: isTyping ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, #06d6a0, #4361ee)',
+                border: 'none', borderRadius: '10px', width: '36px', height: '36px',
+                cursor: isTyping ? 'wait' : 'pointer', display: 'flex',
+                alignItems: 'center', justifyContent: 'center',
+                color: isTyping ? 'rgba(255,255,255,0.3)' : '#000',
+                fontSize: '0.9rem', transition: 'all 0.2s',
+              }}>
+                {isTyping ? '•' : '→'}
+              </button>
+            </form>
+          </div>
         </div>
       )}
 
       <style>{`
-        @keyframes nayraReveal {
-          from { opacity: 0; transform: translateY(20px) scale(0.95); }
+        @keyframes nayraPopIn {
+          from { opacity: 0; transform: translateY(15px) scale(0.9); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .typing-dots { display: flex; gap: 4px; }
-        .typing-dots span {
-          width: 6px; height: 6px; background: var(--accent-cyan); border-radius: 50%;
-          animation: dots 1.4s infinite; opacity: 0.3;
+        @keyframes nayraLive {
+          0%, 100% { opacity: 1; box-shadow: 0 0 8px #06d6a0; }
+          50% { opacity: 0.4; box-shadow: 0 0 4px #06d6a0; }
         }
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes dots {
+        .nayra-dots { display: flex; gap: 3px; }
+        .nayra-dots span {
+          width: 5px; height: 5px; background: #06d6a0; border-radius: 50%;
+          animation: nayraBounce 1.4s infinite; opacity: 0.3;
+        }
+        .nayra-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .nayra-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes nayraBounce {
           0%, 100% { transform: translateY(0); opacity: 0.3; }
-          50% { transform: translateY(-4px); opacity: 1; }
+          50% { transform: translateY(-3px); opacity: 1; }
         }
       `}</style>
     </div>
