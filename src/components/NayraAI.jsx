@@ -132,7 +132,7 @@ export default function NayraAI() {
               <div>
                 <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, color: '#f0f0f0', fontSize: '0.8rem', letterSpacing: '0.05em' }}>NAYRA AI</div>
                 <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>
-                  POWERED BY <span style={{ color: '#06d6a0' }}>GROQ</span>
+                  Created by <span style={{ color: '#06d6a0' }}>Suraj Satyaprakash</span>
                 </div>
               </div>
               <div style={{
